@@ -15,6 +15,7 @@ router = APIRouter(prefix="/users", tags=["user"])
 async def register_user(user: UserCreate, db: Session = Depends(get_db)):
     """
         User registration
+
     """
     try:
         logger.info(f"Attempting to register user with email: {user.email} and username: {user.username}")
@@ -35,7 +36,7 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
                 detail="This username is taken",
             )
         created_user = await create_user(db, user)
-        logger.info("Creating user in the database")
+        logger.info(f"User- {created_user.username}, {created_user.email} registered successfully")
         return created_user
 
     except Exception as e:

@@ -1,11 +1,14 @@
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session,joinedload
 from app.models.events import Event
 from app.models.users import User
 from datetime import datetime
 from app.schemas.events import EventCreate, EventUpdate
 from sqlalchemy import func
 from app.models.users_events import user_event
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 async def create_event(db: Session, event_data: EventCreate, current_user: User):

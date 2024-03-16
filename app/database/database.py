@@ -13,7 +13,7 @@ os.makedirs(database_dir, exist_ok=True)
 
 SQLALCHEMY_DATABASE_URL = f"sqlite:///{os.path.join(database_dir, 'database.db')}"
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={'check_same_thread': False})
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

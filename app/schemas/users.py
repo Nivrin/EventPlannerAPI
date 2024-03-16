@@ -1,10 +1,8 @@
-from pydantic import BaseModel, EmailStr, Field
-from datetime import date, datetime, time
-from typing import Optional
+from pydantic import EmailStr, Field, BaseModel
 
 
 class UserCreate(BaseModel):
-    email: EmailStr = Field(..., max_length=30, examples =["user@example.com"])
+    email: EmailStr = Field(..., examples=["user@example.com"])
     username: str = Field(..., max_length=50, examples =["example_user"])
     password: str = Field(..., max_length=100, examples=["password123"])
 
@@ -21,7 +19,7 @@ class UserLogin(BaseModel):
 
 
 class UserCreateResponse(BaseModel):
-    email: EmailStr = Field(..., max_length=30, examples =["user@example.com"])
+    email: EmailStr = Field(..., examples =["user@example.com"])
     username: str = Field(..., max_length=50, examples =["example_user"])
     password: str = Field(..., max_length=100, examples=["password123"])
 

@@ -7,11 +7,8 @@ from app.database.database import get_db
 from app.models.users import User
 import jwt
 from jwt import DecodeError, ExpiredSignatureError
+from app.config.config import SECRET_KEY,ALGORITHM,ACCESS_TOKEN_EXPIRE_MINUTES
 
-
-SECRET_KEY = "0f2c09ff656e11d74f7bb7d83a55ac0ca934515fbbf2241827045b5e2be4fe9e"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -26,7 +23,7 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-async def authenticate_user( db: Session, username: str, password: str):
+async def authenticate_user(db: Session, username: str, password: str):
     user = db.query(User).filter(User.username == username).first()
     if not user or not verify_password(password, user.password):
         return None
@@ -35,7 +32,7 @@ async def authenticate_user( db: Session, username: str, password: str):
 
 def create_access_token(username: str):
     to_encode = {"sub": username}
-    expire = datetime.utcnow() + timedelta(minutes=15)
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
