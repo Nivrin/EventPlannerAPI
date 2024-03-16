@@ -3,35 +3,41 @@ version: '3.8'
 services:
 
   web:
-    build: ./project
+    build: .
     ports:
       - 8004:8000
     command: uvicorn main:app --host 0.0.0.0 --reload
     volumes:
-      - ./project:/usr/src/app
+      - ./app:/usr/src/app
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - redis
+    networks:
+      - my-network
 
   worker:
-    build: ./project
+    build: ./app  # Use the same build context as the web service
     command: celery -A worker.celery worker --loglevel=info --logfile=logs/celery.log
     volumes:
-      - ./project:/usr/src/app
+      - ./app:/usr/src/app
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
-      - web
+      - web  # Dependency on web service not needed, remove it
       - redis
+    networks:
+      - my-network
 
   redis:
     image: redis:7
+    networks:
+      - my-network
 
   dashboard:
-    build: ./project
+    build: ./app  # Use the same build context as the web service
     command: celery --broker=redis://redis:6379/0 flower --port=5555
     ports:
       - 5556:5555
@@ -39,6 +45,11 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
-      - web
+      - web  # Dependency on web service not needed, remove it
       - redis
-      - worker
+      - worker  # Add dependency on worker service
+    networks:
+      - my-network
+
+networks:
+  my-network:  # Define a custom network

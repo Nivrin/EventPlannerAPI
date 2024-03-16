@@ -1,8 +1,15 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+import os
 
 Base = declarative_base()
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+database_dir = os.path.join(current_dir, '..', '..', 'data_and_logs', 'database')
+
+os.makedirs(database_dir, exist_ok=True)
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///data_and_logs/database/database.db"
 
