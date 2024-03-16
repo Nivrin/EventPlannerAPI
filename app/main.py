@@ -4,7 +4,7 @@ from starlette.responses import JSONResponse
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from app.auth.auth import create_access_token, authenticate_user
-from app.database.database import get_db
+from app.database.database import get_db, create_database  # Import create_database function
 from app.routes import events, users
 import uvicorn
 from sqlalchemy.orm import Session
@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 app = FastAPI(debug=True)
 
+create_database()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

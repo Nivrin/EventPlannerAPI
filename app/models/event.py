@@ -1,10 +1,9 @@
 from sqlalchemy import Column, Integer, String, Date, Time, DateTime
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
+from app.database.database import Base
 from app.models.user_event import user_event
 
-Base = declarative_base()
 
 class Event(Base):
     __tablename__ = "events"
@@ -17,5 +16,4 @@ class Event(Base):
     event_time = Column(Time)
     creation_at = Column(DateTime, default=datetime.utcnow)
 
-    # Define relationships after all classes are declared
-    # attendees = relationship("User", secondary=user_event, back_populates="events_attended")
+    attendees = relationship("User", secondary=user_event, back_populates="events_attended", lazy='dynamic')

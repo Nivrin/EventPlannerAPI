@@ -1,20 +1,27 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
-# Specify the URL of your pre-existing SQLite database
-SQLALCHEMY_DATABASE_URL = "sqlite:///C:/Users/USER/Desktop/niv/EventPlannerAPI/app/database/database.db"
+Base = declarative_base()
 
-# Create the SQLAlchemy engine
+SQLALCHEMY_DATABASE_URL = "sqlite:///database/database.db"
+
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
-# Create a sessionmaker using the engine
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-# Function to get the database session
+def create_database():
+    Base.metadata.create_all(bind=engine)
+
+    print("Database tables created successfully!")
+
+
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+
