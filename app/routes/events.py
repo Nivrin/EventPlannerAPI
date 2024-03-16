@@ -17,22 +17,25 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/events", tags=["events"])
 
 
-@router.post("/CreateEvent/", response_model=EventResponse)
-async def create_event_handler(event: EventCreate,
-                         db: Session = Depends(get_db),
-                         current_user: User = Depends(get_current_user)
-                         ):
+@router.post("/CreateEvents/", response_model=List[EventResponse])
+async def create_event_handler(events: List[EventCreate],
+                               db: Session = Depends(get_db),
+                               current_user: User = Depends(get_current_user)
+                               ):
     """
-    Create new event
+    Create multiple events
     """
     try:
         if current_user is None:
             raise HTTPException(status_code=401, detail="Not authenticated")
 
-        event_data = await create_event(db, event, current_user)
+        created_events = []
+        for event in events:
+            created_event = await create_event(db, event, current_user)
+            created_events.append(created_event)
 
-        logger.info(f"Event '{event_data.title}' created by user '{current_user.username}'")
-        return event_data
+        logger.info(f"{len(created_events)} events created by user '{current_user.username}'")
+        return created_events
 
     except Exception as e:
         logger.error(f"Error occurred during event creation: {e}")
@@ -41,13 +44,13 @@ async def create_event_handler(event: EventCreate,
 
 @router.get("/GetEvents/", response_model=List[EventResponse])
 async def get_events_handler(db: Session = Depends(get_db),
-                       current_user: User = Depends(get_current_user),
-                       location: Optional[str] = Query(None, description="Filter events by location/venue"),
-                       sort_by: Optional[str] = Query(None, description="Sort events by date, popularity, or creation_time"),
-                       event_id: Optional[int] = Query(None, description="Filter event by ID")
-                       ):
+                             current_user: User = Depends(get_current_user),
+                             location: Optional[str] = Query(None, description="Filter events by location/venue"),
+                             sort_by: Optional[str] = Query(None, description="Sort events by date, popularity, or creation_time"),
+                             event_id: Optional[int] = Query(None, description="Filter event by ID")
+                             ):
     """
-    Get all events
+    Get events
     """
     try:
         if current_user is None:
@@ -63,46 +66,50 @@ async def get_events_handler(db: Session = Depends(get_db),
         raise
 
 
-@router.put("/UpdateById/{event_id}", response_model=EventResponse)
-async def update_event_handler(
-                 event_id: int,
-                 event: EventUpdate,
-                 db: Session = Depends(get_db),
-                 current_user: User = Depends(get_current_user)
-                 ):
+@router.put("/UpdateEvents/", response_model=List[EventResponse])
+async def update_event_handler(events: List[EventUpdate],
+                               db: Session = Depends(get_db),
+                               current_user: User = Depends(get_current_user)
+                               ):
     """
-        update event
+        update multiple event
     """
     try:
         if current_user is None:
             raise HTTPException(status_code=401, detail="Not authenticated")
 
-        updated_event = await update_event(event_id, event, db, current_user)
+        updated_events = []
+        for event in events:
+            updated_event = await update_event(event.id, event, db, current_user)
+            updated_events.append(updated_event)
 
-        logger.info(f"Event '{updated_event.title}' updated by user '{current_user.username}'")
-        return updated_event
-
+        logger.info(f"{len(updated_events)} events updated by user '{current_user.username}'")
+        return updated_events
     except Exception as e:
         logger.error(f"Error occurred during event update: {e}")
         raise
 
 
-@router.delete("/DeleteByID/{event_id}", response_model=EventResponse)
+@router.delete("/DeleteEvents/", response_model=List[EventResponse])
 async def delete_event_handler(
-        event_id: int,
+        event_ids: List[int],
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)
     ):
     """
-        delete event by id
+        Delete multiple events by their IDs
     """
     try:
         if current_user is None:
             raise HTTPException(status_code=401, detail="Not authenticated")
-        deleted_event = await delete_event(event_id, db, current_user)
 
-        logger.info(f"Event '{deleted_event.title}' deleted by user '{current_user.username}'")
-        return deleted_event
+        deleted_events = []
+        for event_id in event_ids:
+            deleted_event = await delete_event(event_id, db, current_user)
+            deleted_events.append(deleted_event)
+
+        logger.info(f"{len(deleted_events)} events deleted by user '{current_user.username}'")
+        return deleted_events
 
     except Exception as e:
         logger.error(f"Error occurred during event deletion: {e}")
@@ -110,11 +117,10 @@ async def delete_event_handler(
 
 
 @router.post("/RegisterEvent/{event_id}", response_model=EventResponse)
-async def register_user_for_event_handler(
-        event_id: int,
-        db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
-        ):
+async def register_user_for_event_handler(event_id: int,
+                                          db: Session = Depends(get_db),
+                                          current_user: User = Depends(get_current_user)
+                                          ):
     """
     Register user for an event
     """

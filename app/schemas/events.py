@@ -18,6 +18,7 @@ class EventCreate(BaseModel):
 
 
 class EventUpdate(BaseModel):
+    id: int = Field(None, examples=["int"])
     title: Optional[str] = Field(None, examples =["string"])
     details: Optional[str] = Field(None, examples =["string"])
     location: Optional[str] = Field(None, examples =["string"])
