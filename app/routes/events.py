@@ -17,7 +17,7 @@ router = APIRouter(prefix="/events", tags=["events"])
 
 
 @router.post("/CreateEvent/", response_model=EventResponse)
-def create_event_handler(event: EventCreate,
+async def create_event_handler(event: EventCreate,
                          db: Session = Depends(get_db),
                          current_user: User = Depends(get_current_user)
                          ):
@@ -28,7 +28,7 @@ def create_event_handler(event: EventCreate,
         if current_user is None:
             raise HTTPException(status_code=401, detail="Not authenticated")
 
-        event_data = create_event(db, event, current_user)
+        event_data = await create_event(db, event, current_user)
 
         logger.info(f"Event '{event_data.title}' created by user '{current_user.username}'")
         return event_data
@@ -39,7 +39,7 @@ def create_event_handler(event: EventCreate,
 
 
 @router.get("/GetEvents/", response_model=List[EventResponse])
-def get_events_handler(db: Session = Depends(get_db),
+async def get_events_handler(db: Session = Depends(get_db),
                        current_user: User = Depends(get_current_user),
                        location: Optional[str] = Query(None, description="Filter events by location/venue"),
                        sort_by: Optional[str] = Query(None, description="Sort events by date, popularity, or creation_time"),
@@ -52,7 +52,7 @@ def get_events_handler(db: Session = Depends(get_db),
         if current_user is None:
             raise HTTPException(status_code=401, detail="Not authenticated")
 
-        events = get_events(db, location, sort_by, event_id)
+        events = await get_events(db, location, sort_by, event_id)
 
         logger.info(f"{len(events)} events retrieved for user '{current_user.username}'")
         return events
@@ -63,7 +63,7 @@ def get_events_handler(db: Session = Depends(get_db),
 
 
 @router.put("/UpdateById/{event_id}", response_model=EventResponse)
-def update_event_handler(
+async def update_event_handler(
                  event_id: int,
                  event: EventUpdate,
                  db: Session = Depends(get_db),
@@ -76,7 +76,7 @@ def update_event_handler(
         if current_user is None:
             raise HTTPException(status_code=401, detail="Not authenticated")
 
-        updated_event = update_event(event_id, event, db, current_user)
+        updated_event = await update_event(event_id, event, db, current_user)
 
         logger.info(f"Event '{updated_event.title}' updated by user '{current_user.username}'")
         return updated_event
@@ -87,7 +87,7 @@ def update_event_handler(
 
 
 @router.delete("/DeleteByID/{event_id}", response_model=EventResponse)
-def delete_event_handler(
+async def delete_event_handler(
         event_id: int,
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)
@@ -98,7 +98,7 @@ def delete_event_handler(
     try:
         if current_user is None:
             raise HTTPException(status_code=401, detail="Not authenticated")
-        deleted_event = delete_event(event_id, db, current_user)
+        deleted_event = await delete_event(event_id, db, current_user)
 
         logger.info(f"Event '{deleted_event.title}' deleted by user '{current_user.username}'")
         return deleted_event
@@ -109,7 +109,7 @@ def delete_event_handler(
 
 
 @router.post("/RegisterEvent/{event_id}", response_model=EventResponse)
-def register_user_for_event_handler(
+async def register_user_for_event_handler(
         event_id: int,
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)
@@ -120,7 +120,7 @@ def register_user_for_event_handler(
     try:
         if current_user is None:
             raise HTTPException(status_code=401, detail="Not authenticated")
-        registered_event = register_user_for_event(event_id, db, current_user)
+        registered_event = await register_user_for_event(event_id, db, current_user)
 
         logger.info(f"User '{current_user.username}' registered for event '{registered_event.title}'")
         return registered_event
@@ -131,7 +131,7 @@ def register_user_for_event_handler(
 
 
 @router.post("/UnregisterEvent/{event_id}", response_model=EventResponse)
-def unregister_user_for_event_handler(
+async def unregister_user_for_event_handler(
         event_id: int,
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)
@@ -143,7 +143,7 @@ def unregister_user_for_event_handler(
         if current_user is None:
             raise HTTPException(status_code=401, detail="Not authenticated")
 
-        unregistered_event = unregister_user_for_event(event_id, db, current_user)
+        unregistered_event = await unregister_user_for_event(event_id, db, current_user)
 
         logger.info(f"User '{current_user.username}' unregistered from event '{unregistered_event.title}'")
         return unregistered_event

@@ -8,7 +8,7 @@ from sqlalchemy import func
 from app.models.users_events import user_event
 
 
-def create_event(db: Session, event_data: EventCreate, current_user: User):
+async def create_event(db: Session, event_data: EventCreate, current_user: User):
     event_dict = event_data.dict()
     event_dict["creator_id"] = current_user.id
     db_event = Event(**event_dict)
@@ -24,7 +24,7 @@ def create_event(db: Session, event_data: EventCreate, current_user: User):
     return db_event
 
 
-def get_events(db: Session, location: str = None, sort_by: str = None, event_id: int = None):
+async def get_events(db: Session, location: str = None, sort_by: str = None, event_id: int = None):
     if event_id:
         event = db.query(Event).filter(Event.id == event_id).first()
         if event is None:
@@ -49,7 +49,7 @@ def get_events(db: Session, location: str = None, sort_by: str = None, event_id:
     return query.all()
 
 
-def update_event(event_id: int, event: EventUpdate, db: Session, current_user: User):
+async def update_event(event_id: int, event: EventUpdate, db: Session, current_user: User):
 
     db_event = db.query(Event).filter(Event.id == event_id).first()
     if db_event is None:
@@ -71,7 +71,7 @@ def update_event(event_id: int, event: EventUpdate, db: Session, current_user: U
     return db_event
 
 
-def delete_event(event_id: int, db: Session, current_user: User):
+async def delete_event(event_id: int, db: Session, current_user: User):
     """
         delete event by id
     """
@@ -90,7 +90,7 @@ def delete_event(event_id: int, db: Session, current_user: User):
     return db_event
 
 
-def register_user_for_event(
+async def register_user_for_event(
         event_id: int,
         db: Session,
         current_user: User,
@@ -118,7 +118,7 @@ def register_user_for_event(
     return event
 
 
-def unregister_user_for_event(
+async def unregister_user_for_event(
         event_id: int,
         db: Session,
         current_user: User
