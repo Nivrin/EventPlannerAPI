@@ -11,7 +11,7 @@ database_dir = os.path.join(current_dir, '..', '..', 'data_and_logs', 'database'
 
 os.makedirs(database_dir, exist_ok=True)
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///data_and_logs/database/database.db"
+SQLALCHEMY_DATABASE_URL = f"sqlite:///{os.path.join(database_dir, 'database.db')}"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
