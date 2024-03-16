@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
+
+from app.auth.auth import get_password_hash
 from app.models.users import User
-from app.auth.auth import authenticate_user, create_access_token, get_password_hash
-from app.schemas.users import UserCreate, UserCreateResponse, UserLogin, UserLoginResponse
+from app.schemas.users import UserCreate
 
 
 async def check_existing_email(db: Session, email: str):

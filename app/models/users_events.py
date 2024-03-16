@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, ForeignKey, Table, Boolean
 from app.database.database import Base
+from sqlalchemy import Column, Integer, ForeignKey, Table, Boolean
 
 
 user_event = Table(

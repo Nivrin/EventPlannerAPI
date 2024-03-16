@@ -1,6 +1,8 @@
-from pydantic import BaseModel, Field
 from datetime import date, datetime, time
-from typing import Optional,List
+from typing import List, Optional
+
+from pydantic import BaseModel, Field
+
 from app.schemas.users import UserResponse
 
 

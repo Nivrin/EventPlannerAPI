@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship
 from app.database.database import Base
 from app.models.users_events import user_event
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
+
 
 
 class User(Base):

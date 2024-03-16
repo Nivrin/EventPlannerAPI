@@ -10,12 +10,15 @@ from sqlalchemy.orm import Session
 from starlette.requests import Request
 
 from app.auth.auth import authenticate_user, create_access_token
-from app.config.config import LOG_FILE_PATH, SCHEDULER_INTERVAL_MINUTES
 from app.database.database import create_database, get_db
 from app.routes import events, users
 from app.tasks.background_tasks import send_reminders
 from app.utils.logger import setup_logging
 import uvicorn
+
+SCHEDULER_INTERVAL_MINUTES = 1
+LOG_FILE_PATH = "./data_and_logs/logs/app.log"
+
 
 setup_logging()
 
@@ -66,7 +69,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 @app.get("/logs")
 async def get_logs():
-    print(LOG_FILE_PATH)
     if not os.path.exists(LOG_FILE_PATH):
         raise HTTPException(status_code=404, detail="Log file not found")
 

@@ -1,15 +1,16 @@
+import logging
+from typing import List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from app.models.users import User
+
 from app.auth.auth import get_current_user
 from app.database.database import get_db
+from app.database.operations.events import (create_event, delete_event, get_events,
+                                            register_user_for_event, unregister_user_for_event,
+                                            update_event)
+from app.models.users import User
 from app.schemas.events import EventCreate, EventResponse, EventUpdate
-from typing import List
-from typing import Optional
-from app.database.operations.events import (create_event, get_events, update_event,
-                                            delete_event, register_user_for_event,
-                                            unregister_user_for_event)
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -151,4 +152,3 @@ async def unregister_user_for_event_handler(
     except Exception as e:
         logger.error(f"Error occurred during user unregistration for event: {e}")
         raise
-

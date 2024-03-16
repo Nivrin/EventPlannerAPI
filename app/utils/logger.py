@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 from logging.handlers import RotatingFileHandler
 
 
@@ -25,4 +25,3 @@ def setup_logging():
     logger.setLevel(logging.INFO)
 
     return logger
-

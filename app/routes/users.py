@@ -1,10 +1,14 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.database.database import get_db
-from app.schemas.users import UserCreate, UserCreateResponse, UserLogin, UserLoginResponse
+
 from app.auth.auth import authenticate_user, create_access_token
-from app.database.operations.users import check_existing_email,check_existing_username,create_user
-import logging
+from app.database.database import get_db
+from app.database.operations.users import (check_existing_email, check_existing_username,
+                                           create_user)
+from app.schemas.users import (UserCreate, UserCreateResponse, UserLogin,
+                                UserLoginResponse)
 
 logger = logging.getLogger(__name__)
 

@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
-from app.models.events import Event
-from app.database.database import get_db
-from app.utils.email import send_email_reminder
 from sqlalchemy import func
-from app.models.users_events import user_event
 
+from app.database.database import get_db
+from app.models.events import Event
+from app.models.users_events import user_event
+from app.utils.email import send_email_reminder
 
 def send_reminders():
     """

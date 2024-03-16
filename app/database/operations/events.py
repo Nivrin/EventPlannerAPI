@@ -1,12 +1,13 @@
-from fastapi import HTTPException
-from sqlalchemy.orm import Session,joinedload
+import logging
+from datetime import datetime
+
 from app.models.events import Event
 from app.models.users import User
-from datetime import datetime
-from app.schemas.events import EventCreate, EventUpdate
-from sqlalchemy import func
 from app.models.users_events import user_event
-import logging
+from app.schemas.events import EventCreate, EventUpdate
+from fastapi import HTTPException
+from sqlalchemy import func
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
@@ -149,4 +150,3 @@ async def unregister_user_for_event(
     db.refresh(current_user)
 
     return event
-

@@ -1,13 +1,18 @@
+from datetime import datetime, timedelta
+
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
+from jwt import DecodeError, ExpiredSignatureError
+import jwt
 from passlib.context import CryptContext
-from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
+
 from app.database.database import get_db
 from app.models.users import User
-import jwt
-from jwt import DecodeError, ExpiredSignatureError
-from app.config.config import SECRET_KEY,ALGORITHM,ACCESS_TOKEN_EXPIRE_MINUTES
+
+SECRET_KEY = "0f2c09ff656e11d74f7bb7d83a55ac0ca934515fbbf2241827045b5e2be4fe9e"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
