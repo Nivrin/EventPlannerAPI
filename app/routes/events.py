@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.models.user import User
+from app.models.user_event import user_event
 from app.auth.auth import get_current_user
 from app.database.database import get_db
 from app.models.event import Event
@@ -130,12 +131,11 @@ def delete_event_by_id(event_id: int, db: Session = Depends(get_db), current_use
 
 
 @router.post("/RegisterEvent/{event_id}", response_model=EventResponse)
-def register_user_for_event(event_id: int, db: Session = Depends(get_db),
+def register_user_for_event_by_id(event_id: int, db: Session = Depends(get_db),
                             current_user: User = Depends(get_current_user)):
     """
     Register user for an event
     """
-
     if current_user is None:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
@@ -147,12 +147,45 @@ def register_user_for_event(event_id: int, db: Session = Depends(get_db),
 
     event_datetime = datetime.combine(event.event_date, event.event_time)
     if event_datetime <= current_datetime:
-        raise HTTPException(status_code=400, detail="Cannot update past events")
+        raise HTTPException(status_code=400, detail="Cannot register past events")
 
-    if event in current_user.events_attended:
+    if event in current_user.events_registered:
         raise HTTPException(status_code=400, detail="User already registered for this event")
-    print(current_user.username)
-    current_user.events_attended.append(event)
+
+    current_user.events_registered.append(event)
     db.commit()
     db.refresh(current_user)
+    return event
+
+
+@router.post("/UnregisterEvent/{event_id}", response_model=EventResponse)
+def unregister_user_for_event_by_id(event_id: int, db: Session = Depends(get_db),
+                            current_user: User = Depends(get_current_user)):
+    """
+    Unregister user for an event
+    """
+    if current_user is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    event = db.query(Event).filter(Event.id == event_id).first()
+    if event is None:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    current_datetime = datetime.now()
+
+    event_datetime = datetime.combine(event.event_date, event.event_time)
+    if event_datetime <= current_datetime:
+        raise HTTPException(status_code=400, detail="Cannot unregister past events")
+
+    if event not in current_user.events_registered:
+        raise HTTPException(status_code=400, detail="User already not registered for this event")
+
+
+    # Remove the association between the user and the event
+    db.execute(user_event.delete().where(user_event.c.user_id == current_user.id)
+               .where(user_event.c.event_id == event_id))
+    db.commit()
+    db.refresh(current_user)
+
+
     return event

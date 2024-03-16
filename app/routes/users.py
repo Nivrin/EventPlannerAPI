@@ -13,11 +13,19 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     """
         User registration
     """
+    db_email = db.query(User).filter(User.email == user.email).first()
     db_user = db.query(User).filter(User.username == user.username).first()
+
+    if db_email :
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User with this email already registered",
+        )
+
     if db_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already registered",
+            detail="This username is taken",
         )
 
     hashed_password = get_password_hash(user.password)

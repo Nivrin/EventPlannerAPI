@@ -29,3 +29,7 @@ class UserCreateResponse(BaseModel):
 class UserLoginResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+class UserResponse(BaseModel):
+    username: str = Field(..., max_length=50)
