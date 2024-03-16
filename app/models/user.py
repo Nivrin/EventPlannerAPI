@@ -12,4 +12,4 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     password = Column(String)
 
-    events_attended = relationship("Event", secondary=user_event, back_populates="attendees", lazy='dynamic')
+    events_registered = relationship("Event", secondary=user_event, back_populates="attendees", lazy='dynamic')

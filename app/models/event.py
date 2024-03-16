@@ -16,4 +16,4 @@ class Event(Base):
     event_time = Column(Time)
     creation_at = Column(DateTime, default=datetime.utcnow)
 
-    attendees = relationship("User", secondary=user_event, back_populates="events_attended", lazy='dynamic')
+    attendees = relationship("User", secondary=user_event, back_populates="events_registered", lazy='dynamic')
