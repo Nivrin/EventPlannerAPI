@@ -15,7 +15,10 @@ router = APIRouter(prefix="/events", tags=["events"])
 
 
 @router.post("/CreateEvent/", response_model=EventResponse)
-def create_event(event: EventCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def create_event(event: EventCreate,
+                 db: Session = Depends(get_db),
+                 current_user: User = Depends(get_current_user)
+                 ):
     """
     Create new event
     """
@@ -24,6 +27,7 @@ def create_event(event: EventCreate, db: Session = Depends(get_db), current_user
         raise HTTPException(status_code=401, detail="Not authenticated")
 
     event_dict = event.dict()
+    event_dict["creator_id"] = current_user.id
     db_event = Event(**event_dict)
 
     current_datetime = datetime.now()
@@ -69,7 +73,11 @@ def get_events(db: Session = Depends(get_db),
 
 
 @router.get("/GetByID/{event_id}", response_model=EventResponse)
-def get_event_by_id(event_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def get_event_by_id(
+        event_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+        ):
     """
          Get event by id
     """
@@ -84,7 +92,11 @@ def get_event_by_id(event_id: int, db: Session = Depends(get_db), current_user: 
 
 
 @router.put("/UpdateById/{event_id}", response_model= EventResponse)
-def update_event(event_id: int, event: EventUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def update_event(event_id: int,
+                 event: EventUpdate,
+                 db: Session = Depends(get_db),
+                 current_user: User = Depends(get_current_user)
+                 ):
     """
         update event
     """
@@ -92,8 +104,10 @@ def update_event(event_id: int, event: EventUpdate, db: Session = Depends(get_db
     if current_user is None:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    print("Received request to update event with ID:", event)
     db_event = db.query(Event).filter(Event.id == event_id).first()
+    if db_event.creator_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You are not the creator of this event")
+
     if db_event is None:
         raise HTTPException(status_code=404, detail="Event not found")
 
@@ -111,7 +125,11 @@ def update_event(event_id: int, event: EventUpdate, db: Session = Depends(get_db
 
 
 @router.delete("/DeleteByID/{event_id}", response_model= EventResponse)
-def delete_event_by_id(event_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def delete_event_by_id(
+        event_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+    ):
     """
         delete event by id
     """
@@ -120,6 +138,9 @@ def delete_event_by_id(event_id: int, db: Session = Depends(get_db), current_use
         raise HTTPException(status_code=401, detail="Not authenticated")
 
     db_event = db.query(Event).filter(Event.id == event_id).first()
+
+    if db_event.creator_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You are not the creator of this event")
 
     if db_event is None:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -131,8 +152,11 @@ def delete_event_by_id(event_id: int, db: Session = Depends(get_db), current_use
 
 
 @router.post("/RegisterEvent/{event_id}", response_model=EventResponse)
-def register_user_for_event_by_id(event_id: int, db: Session = Depends(get_db),
-                            current_user: User = Depends(get_current_user)):
+def register_user_for_event_by_id(
+        event_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+        ):
     """
     Register user for an event
     """
@@ -159,8 +183,11 @@ def register_user_for_event_by_id(event_id: int, db: Session = Depends(get_db),
 
 
 @router.post("/UnregisterEvent/{event_id}", response_model=EventResponse)
-def unregister_user_for_event_by_id(event_id: int, db: Session = Depends(get_db),
-                            current_user: User = Depends(get_current_user)):
+def unregister_user_for_event_by_id(
+        event_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+        ):
     """
     Unregister user for an event
     """
@@ -180,12 +207,9 @@ def unregister_user_for_event_by_id(event_id: int, db: Session = Depends(get_db)
     if event not in current_user.events_registered:
         raise HTTPException(status_code=400, detail="User already not registered for this event")
 
-
-    # Remove the association between the user and the event
     db.execute(user_event.delete().where(user_event.c.user_id == current_user.id)
                .where(user_event.c.event_id == event_id))
     db.commit()
     db.refresh(current_user)
-
 
     return event

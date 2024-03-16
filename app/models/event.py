@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, Time, DateTime
+from sqlalchemy import Column, Integer, String, Date, Time, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.database.database import Base
@@ -15,5 +15,7 @@ class Event(Base):
     event_date = Column(Date)
     event_time = Column(Time)
     creation_at = Column(DateTime, default=datetime.utcnow)
+    creator_id = Column(Integer, ForeignKey('users.id'))
 
+    creator = relationship("User", back_populates="events_created")
     attendees = relationship("User", secondary=user_event, back_populates="events_registered", lazy='dynamic')

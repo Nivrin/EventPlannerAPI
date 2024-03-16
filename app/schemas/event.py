@@ -3,6 +3,7 @@ from datetime import date, datetime, time
 from typing import Optional,List
 from app.schemas.users import UserResponse
 
+
 class EventCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=50, examples =["string"])
     details: str = Field(..., max_length=100, examples =["string"])
@@ -33,4 +34,5 @@ class EventResponse(BaseModel):
     event_date: Optional[date]
     event_time: Optional[time]
     creation_at: Optional[datetime]
-    attendees: List[UserResponse]
+    creator: Optional[UserResponse]
+    attendees: Optional[List[UserResponse]]
