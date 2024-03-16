@@ -18,4 +18,4 @@ class Event(Base):
     creator_id = Column(Integer, ForeignKey('users.id'))
 
     creator = relationship("User", back_populates="events_created")
-    attendees = relationship("User", secondary=user_event, back_populates="events_registered", lazy='dynamic')
+    participants = relationship("User", secondary=user_event, back_populates="events_registered", lazy='dynamic')

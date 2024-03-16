@@ -13,4 +13,4 @@ class User(Base):
     password = Column(String)
 
     events_created = relationship("Event", back_populates="creator")
-    events_registered = relationship("Event", secondary=user_event, back_populates="attendees", lazy='dynamic')
+    events_registered = relationship("Event", secondary=user_event, back_populates="participants", lazy='dynamic')

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.models.user import User
 from app.models.user_event import user_event
 from app.auth.auth import get_current_user
@@ -45,7 +46,7 @@ def create_event(event: EventCreate,
 def get_events(db: Session = Depends(get_db),
                current_user: User = Depends(get_current_user),
                location: Optional[str] = Query(None, description="Filter events by location/venue"),
-               sort_by: Optional[str] = Query(None, description="Sort events by date, popularity, or creation time"),
+               sort_by: Optional[str] = Query(None, description="Sort events by date, popularity, or creation_time")
                ):
     """
      Get all events
@@ -61,11 +62,11 @@ def get_events(db: Session = Depends(get_db),
 
     if sort_by:
         if sort_by.lower() == "date":
-            query = query.order_by(Event.event_date)
+            query = query.order_by(Event.event_date.desc(), Event.event_time.desc())
         elif sort_by.lower() == "popularity":
-            query = query.order_by(Event.attendees.count().desc())
+            query = query.outerjoin(Event.participants).group_by(Event.id).order_by(func.count(User.id).desc())
         elif sort_by.lower() == "creation_time":
-            query = query.order_by(Event.creation_at)
+            query = query.order_by(Event.creation_at.desc())
         else:
             raise HTTPException(status_code=400, detail="Invalid sorting option")
 

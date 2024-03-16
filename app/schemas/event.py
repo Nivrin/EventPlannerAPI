@@ -35,4 +35,4 @@ class EventResponse(BaseModel):
     event_time: Optional[time]
     creation_at: Optional[datetime]
     creator: Optional[UserResponse]
-    attendees: Optional[List[UserResponse]]
+    participants: Optional[List[UserResponse]]
