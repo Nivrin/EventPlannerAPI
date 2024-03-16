@@ -1,25 +1,23 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import func
 from app.models.user import User
-from app.models.user_event import user_event
 from app.auth.auth import get_current_user
 from app.database.database import get_db
-from app.models.event import Event
 from app.schemas.event import EventCreate, EventResponse, EventUpdate
 from typing import List
-from datetime import datetime
 from typing import Optional
-
+from app.database.operations.events import (create_event, get_events, update_event,
+                                            delete_event, register_user_for_event,
+                                            unregister_user_for_event)
 
 router = APIRouter(prefix="/events", tags=["events"])
 
 
 @router.post("/CreateEvent/", response_model=EventResponse)
-def create_event(event: EventCreate,
-                 db: Session = Depends(get_db),
-                 current_user: User = Depends(get_current_user)
-                 ):
+def create_event_handler(event: EventCreate,
+                         db: Session = Depends(get_db),
+                         current_user: User = Depends(get_current_user)
+                         ):
     """
     Create new event
     """
@@ -27,73 +25,29 @@ def create_event(event: EventCreate,
     if current_user is None:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    event_dict = event.dict()
-    event_dict["creator_id"] = current_user.id
-    db_event = Event(**event_dict)
-
-    current_datetime = datetime.now()
-    event_datetime = datetime.combine(db_event.event_date, db_event.event_time)
-    if event_datetime <= current_datetime:
-        raise HTTPException(status_code=400, detail="Cannot create past events")
-
-    db.add(db_event)
-    db.commit()
-    db.refresh(db_event)
-    return db_event
+    return create_event(db, event, current_user)
 
 
 @router.get("/GetEvents/", response_model=List[EventResponse])
-def get_events(db: Session = Depends(get_db),
-               current_user: User = Depends(get_current_user),
-               location: Optional[str] = Query(None, description="Filter events by location/venue"),
-               sort_by: Optional[str] = Query(None, description="Sort events by date, popularity, or creation_time")
-               ):
+def get_events_handler(db: Session = Depends(get_db),
+                       current_user: User = Depends(get_current_user),
+                       location: Optional[str] = Query(None, description="Filter events by location/venue"),
+                       sort_by: Optional[str] = Query(None, description="Sort events by date, popularity, or creation_time"),
+                       event_id: Optional[int] = Query(None, description="Filter event by ID")
+                       ):
     """
-     Get all events
-    """
-
-    if current_user is None:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-
-    query = db.query(Event)
-
-    if location:
-        query = query.filter(Event.location == location)
-
-    if sort_by:
-        if sort_by.lower() == "date":
-            query = query.order_by(Event.event_date.desc(), Event.event_time.desc())
-        elif sort_by.lower() == "popularity":
-            query = query.outerjoin(Event.participants).group_by(Event.id).order_by(func.count(User.id).desc())
-        elif sort_by.lower() == "creation_time":
-            query = query.order_by(Event.creation_at.desc())
-        else:
-            raise HTTPException(status_code=400, detail="Invalid sorting option")
-
-    return query.all()
-
-
-@router.get("/GetByID/{event_id}", response_model=EventResponse)
-def get_event_by_id(
-        event_id: int,
-        db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
-        ):
-    """
-         Get event by id
+    Get all events
     """
 
     if current_user is None:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    event = db.query(Event).filter(Event.id == event_id).first()
-    if event is None:
-        raise HTTPException(status_code=404, detail="Event not found")
-    return event
+    return get_events(db, location, sort_by, event_id)
 
 
 @router.put("/UpdateById/{event_id}", response_model= EventResponse)
-def update_event(event_id: int,
+def update_event_handler(
+                 event_id: int,
                  event: EventUpdate,
                  db: Session = Depends(get_db),
                  current_user: User = Depends(get_current_user)
@@ -105,28 +59,11 @@ def update_event(event_id: int,
     if current_user is None:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    db_event = db.query(Event).filter(Event.id == event_id).first()
-    if db_event.creator_id != current_user.id:
-        raise HTTPException(status_code=403, detail="You are not the creator of this event")
-
-    if db_event is None:
-        raise HTTPException(status_code=404, detail="Event not found")
-
-    current_datetime = datetime.now()
-    event_datetime = datetime.combine(db_event.event_date, db_event.event_time)
-    if event_datetime <= current_datetime:
-        raise HTTPException(status_code=400, detail="Cannot update past events")
-
-    for attr, value in event.dict().items():
-        if value is not None:
-            setattr(db_event, attr, value)
-    db.commit()
-    db.refresh(db_event)
-    return db_event
+    return update_event(event_id,event,db,current_user)
 
 
-@router.delete("/DeleteByID/{event_id}", response_model= EventResponse)
-def delete_event_by_id(
+@router.delete("/DeleteByID/{event_id}", response_model=EventResponse)
+def delete_event_handler(
         event_id: int,
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)
@@ -134,26 +71,11 @@ def delete_event_by_id(
     """
         delete event by id
     """
-
-    if current_user is None:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-
-    db_event = db.query(Event).filter(Event.id == event_id).first()
-
-    if db_event.creator_id != current_user.id:
-        raise HTTPException(status_code=403, detail="You are not the creator of this event")
-
-    if db_event is None:
-        raise HTTPException(status_code=404, detail="Event not found")
-
-    db.delete(db_event)
-
-    db.commit()
-    return db_event
+    return delete_event(event_id, db, current_user)
 
 
 @router.post("/RegisterEvent/{event_id}", response_model=EventResponse)
-def register_user_for_event_by_id(
+def register_user_for_event_handler(
         event_id: int,
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)
@@ -164,27 +86,11 @@ def register_user_for_event_by_id(
     if current_user is None:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    event = db.query(Event).filter(Event.id == event_id).first()
-    if event is None:
-        raise HTTPException(status_code=404, detail="Event not found")
-
-    current_datetime = datetime.now()
-
-    event_datetime = datetime.combine(event.event_date, event.event_time)
-    if event_datetime <= current_datetime:
-        raise HTTPException(status_code=400, detail="Cannot register past events")
-
-    if event in current_user.events_registered:
-        raise HTTPException(status_code=400, detail="User already registered for this event")
-
-    current_user.events_registered.append(event)
-    db.commit()
-    db.refresh(current_user)
-    return event
+    return register_user_for_event(event_id, db, current_user)
 
 
 @router.post("/UnregisterEvent/{event_id}", response_model=EventResponse)
-def unregister_user_for_event_by_id(
+def unregister_user_for_event_handler(
         event_id: int,
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)
@@ -195,22 +101,4 @@ def unregister_user_for_event_by_id(
     if current_user is None:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    event = db.query(Event).filter(Event.id == event_id).first()
-    if event is None:
-        raise HTTPException(status_code=404, detail="Event not found")
-
-    current_datetime = datetime.now()
-
-    event_datetime = datetime.combine(event.event_date, event.event_time)
-    if event_datetime <= current_datetime:
-        raise HTTPException(status_code=400, detail="Cannot unregister past events")
-
-    if event not in current_user.events_registered:
-        raise HTTPException(status_code=400, detail="User already not registered for this event")
-
-    db.execute(user_event.delete().where(user_event.c.user_id == current_user.id)
-               .where(user_event.c.event_id == event_id))
-    db.commit()
-    db.refresh(current_user)
-
-    return event
+    return unregister_user_for_event(event_id, db, current_user)
