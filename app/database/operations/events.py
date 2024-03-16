@@ -52,11 +52,11 @@ def get_events(db: Session, location: str = None, sort_by: str = None, event_id:
 def update_event(event_id: int, event: EventUpdate, db: Session, current_user: User):
 
     db_event = db.query(Event).filter(Event.id == event_id).first()
-    if db_event.creator_id != current_user.id:
-        raise HTTPException(status_code=403, detail="You are not the creator of this event")
-
     if db_event is None:
         raise HTTPException(status_code=404, detail="Event not found")
+
+    if db_event.creator_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You are not the creator of this event")
 
     current_datetime = datetime.now()
     event_datetime = datetime.combine(db_event.event_date, db_event.event_time)

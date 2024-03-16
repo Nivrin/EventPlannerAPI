@@ -1,7 +1,7 @@
 import sqlite3
 
-# Connect to the SQLite database
-conn = sqlite3.connect('../app/database/database.db')
+# Connect to the SQLite data_and_logs
+conn = sqlite3.connect('../app/data_and_logs/database/database.db')
 cursor = conn.cursor()
 
 # Create the users table

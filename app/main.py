@@ -8,13 +8,26 @@ from app.database.database import get_db, create_database  # Import create_datab
 from app.routes import events, users
 import uvicorn
 from sqlalchemy.orm import Session
-
+from app.tasks.reminder_tasks import celery_
+from app.utils.logger import  setup_logging
+import logging
 
 app = FastAPI(debug=True)
+setup_logging()
+logging.info('Application started')
 
 create_database()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+# app.config = {
+#     "CELERY_BROKER_URL": "redis://localhost:6379/0",
+# }
+
+# @app.on_event("startup")
+# async def startup_event():
+#     # Start the Celery scheduler when the FastAPI application starts
+#     celery_.conf.update(app.config)
 
 
 @app.get("/")
@@ -25,7 +38,6 @@ async def health_check():
 @app.post("/token")
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(db,form_data.username, form_data.password)
-    print("fsafassffas")
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

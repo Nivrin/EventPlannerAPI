@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///database/database.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///data_and_logs/database/database.db"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 

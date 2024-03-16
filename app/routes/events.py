@@ -9,6 +9,9 @@ from typing import Optional
 from app.database.operations.events import (create_event, get_events, update_event,
                                             delete_event, register_user_for_event,
                                             unregister_user_for_event)
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/events", tags=["events"])
 
@@ -21,11 +24,18 @@ def create_event_handler(event: EventCreate,
     """
     Create new event
     """
+    try:
+        if current_user is None:
+            raise HTTPException(status_code=401, detail="Not authenticated")
 
-    if current_user is None:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        event_data = create_event(db, event, current_user)
 
-    return create_event(db, event, current_user)
+        logger.info(f"Event '{event_data.title}' created by user '{current_user.username}'")
+        return event_data
+
+    except Exception as e:
+        logger.error(f"Error occurred during event creation: {e}")
+        raise
 
 
 @router.get("/GetEvents/", response_model=List[EventResponse])
@@ -38,14 +48,21 @@ def get_events_handler(db: Session = Depends(get_db),
     """
     Get all events
     """
+    try:
+        if current_user is None:
+            raise HTTPException(status_code=401, detail="Not authenticated")
 
-    if current_user is None:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        events = get_events(db, location, sort_by, event_id)
 
-    return get_events(db, location, sort_by, event_id)
+        logger.info(f"{len(events)} events retrieved for user '{current_user.username}'")
+        return events
+
+    except Exception as e:
+        logger.error(f"Error occurred while retrieving events: {e}")
+        raise
 
 
-@router.put("/UpdateById/{event_id}", response_model= EventResponse)
+@router.put("/UpdateById/{event_id}", response_model=EventResponse)
 def update_event_handler(
                  event_id: int,
                  event: EventUpdate,
@@ -55,11 +72,18 @@ def update_event_handler(
     """
         update event
     """
+    try:
+        if current_user is None:
+            raise HTTPException(status_code=401, detail="Not authenticated")
 
-    if current_user is None:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        updated_event = update_event(event_id, event, db, current_user)
 
-    return update_event(event_id,event,db,current_user)
+        logger.info(f"Event '{updated_event.title}' updated by user '{current_user.username}'")
+        return updated_event
+
+    except Exception as e:
+        logger.error(f"Error occurred during event update: {e}")
+        raise
 
 
 @router.delete("/DeleteByID/{event_id}", response_model=EventResponse)
@@ -71,7 +95,17 @@ def delete_event_handler(
     """
         delete event by id
     """
-    return delete_event(event_id, db, current_user)
+    try:
+        if current_user is None:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        deleted_event = delete_event(event_id, db, current_user)
+
+        logger.info(f"Event '{deleted_event.title}' deleted by user '{current_user.username}'")
+        return deleted_event
+
+    except Exception as e:
+        logger.error(f"Error occurred during event deletion: {e}")
+        raise
 
 
 @router.post("/RegisterEvent/{event_id}", response_model=EventResponse)
@@ -83,10 +117,17 @@ def register_user_for_event_handler(
     """
     Register user for an event
     """
-    if current_user is None:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+    try:
+        if current_user is None:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        registered_event = register_user_for_event(event_id, db, current_user)
 
-    return register_user_for_event(event_id, db, current_user)
+        logger.info(f"User '{current_user.username}' registered for event '{registered_event.title}'")
+        return registered_event
+
+    except Exception as e:
+        logger.error(f"Error occurred during user registration for event: {e}")
+        raise
 
 
 @router.post("/UnregisterEvent/{event_id}", response_model=EventResponse)
@@ -98,7 +139,16 @@ def unregister_user_for_event_handler(
     """
     Unregister user for an event
     """
-    if current_user is None:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+    try:
+        if current_user is None:
+            raise HTTPException(status_code=401, detail="Not authenticated")
 
-    return unregister_user_for_event(event_id, db, current_user)
+        unregistered_event = unregister_user_for_event(event_id, db, current_user)
+
+        logger.info(f"User '{current_user.username}' unregistered from event '{unregistered_event.title}'")
+        return unregistered_event
+
+    except Exception as e:
+        logger.error(f"Error occurred during user unregistration for event: {e}")
+        raise
+
