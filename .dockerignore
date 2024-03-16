@@ -87,3 +87,6 @@ venv/
 
 # VS Code
 .vscode/
+
+data_and_logs
+.db
