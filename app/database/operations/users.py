@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.models.user import User
+from app.models.users import User
 from app.auth.auth import authenticate_user, create_access_token, get_password_hash
 from app.schemas.users import UserCreate, UserCreateResponse, UserLogin, UserLoginResponse
 

@@ -4,7 +4,7 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from app.database.database import get_db
-from app.models.user import User
+from app.models.users import User
 import jwt
 from jwt import DecodeError, ExpiredSignatureError
 

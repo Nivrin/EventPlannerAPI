@@ -1,12 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from app.models.event import Event
-from app.models.user import User
+from app.models.events import Event
+from app.models.users import User
 from datetime import datetime
-from app.schemas.event import EventCreate, EventUpdate
+from app.schemas.events import EventCreate, EventUpdate
 from sqlalchemy import func
-from app.auth.auth import get_current_user
-from app.models.user_event import user_event
+from app.models.users_events import user_event
 
 
 def create_event(db: Session, event_data: EventCreate, current_user: User):

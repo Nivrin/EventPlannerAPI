@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Date, Time, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.database.database import Base
-from app.models.user_event import user_event
+from app.models.users_events import user_event
 
 
 class Event(Base):
