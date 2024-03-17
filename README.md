@@ -41,7 +41,46 @@ This EventPlannerAPI application provides backend functionality for managing eve
 8. **Utility Modules (`app/utils`):**
    - Contains utility modules for "email" sending, logging setup, and other helper functions.
 
-## Installation:
+## Local Deployment Instructions
+
+### 1. Install Python
+Ensure you have Python 3.10 installed on your local machine. You can download and install Python from the [official website](https://www.python.org/downloads/).
+
+### 2. Clone the Repository
+Clone the repository to your local machine using Git. Open a terminal or command prompt and run the following command:
+   ```bash
+   git clone https://github.com/Nivrin/EventPlannerAPI.git
+   ```
+### 3. Navigate to the Project Directory
+Change your current directory to the project directory:
+   ```bash
+   cd EventPlannerAPI
+   ```
+### 4. Install Dependencies
+Install the required Python dependencies using pip and the requirements.txt file:
+   ```bash
+   pip install -r requirements.txt
+   ```
+### Run the Application
+Once the dependencies are installed, you can run the application using Uvicorn:
+   ```bash
+   uvicorn app.main:app --host 0.0.0.0 --port 8000
+   ```
+g
+## Access the API:
+You can now access the API endpoints by navigating to the following URL in your browser:
+
+To access the interactive API documentation provided by Swagger UI, navigate to the following URL in your browser:
+
+- [API Documentation](http://localhost:8000/docs)
+
+This will open a web interface where you can explore and interact with the available endpoints.
+
+Additionally, you can access the logs endpoint to view the application logs. Navigate to the following URL in your browser:
+
+- [Logs Endpoint](http://localhost:8000/logs)
+
+## Local Deployment Instructions - By Docker
 
 1. Clone the repository:
 
