@@ -56,7 +56,7 @@ Change your current directory to the project directory:
    ```bash
    cd EventPlannerAPI
    ```
-### 4. Install Dependencies
+#### 4. Install Dependencies
 Install the required Python dependencies using pip and the requirements.txt file:
    ```bash
    pip install -r requirements.txt
