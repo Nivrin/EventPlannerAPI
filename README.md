@@ -41,11 +41,11 @@ This EventPlannerAPI application provides backend functionality for managing eve
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/your-repository.git
+   git clone https://github.com/Nivrin/EventPlannerAPI.git
    ```
    Navigate to the project directory:
     ```bash
-   cd your-repository
+   cd EventPlannerAPI
    ```
     After navigating to the project directory, build the Docker image using the following command:
    ```bash
