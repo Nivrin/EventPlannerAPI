@@ -59,7 +59,7 @@ Change your current directory to the project directory:
 #### 4. Install Dependencies
 Install the required Python dependencies using pip and the requirements.txt file:
    ```bash
-   pip install -r requirements.txt
+   pip install -r requirements2.txt
    ```
 #### 5. Run the Application
 Once the dependencies are installed, you can run the application using Uvicorn:
