@@ -82,20 +82,20 @@ Additionally, you can access the logs endpoint to view the application logs. Nav
 
 ## Local Deployment Instructions - By Docker
 
-1. Clone the repository:
+### 1. Clone the repository:
 
    ```bash
    git clone https://github.com/Nivrin/EventPlannerAPI.git
    ```
-   Navigate to the project directory:
-    ```bash
+### 2. Navigate to the project directory:
+   ```bash
    cd EventPlannerAPI
    ```
-    After navigating to the project directory, build the Docker image using the following command:
+### 3. After navigating to the project directory, build the Docker image using the following command:
    ```bash
     docker build -t EventPlannerAPI .  
    ```
-   Once the Docker image is built, you can run a Docker container using the following command:
+### 4. Once the Docker image is built, you can run a Docker container using the following command:
    ```bash
    docker run -d -p 8000:8000 EventPlannerAPI
    ```
