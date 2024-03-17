@@ -2,6 +2,11 @@
 
 This EventPlannerAPI application provides backend functionality for managing events and user registrations. It offers a range of endpoints for creating, updating, and deleting events, as well as for registering and unregistering users for events, user authentication, and more.
 
+
+## DataBase Architecture
+
+![Architecture](images/DB.JPG)
+
 ## Components:
 
 1. **Main Application (`app/main.py`):**
