@@ -69,7 +69,8 @@ Once the dependencies are installed, you can run the application using Uvicorn:
 
 ## Access the API:
 You can now access the API endpoints by navigating to the following URL in your browser:
-
+- [API](http://localhost:8000/)
+- 
 To access the interactive API documentation provided by Swagger UI, navigate to the following URL in your browser:
 
 - [API Documentation](http://localhost:8000/docs)
@@ -107,6 +108,7 @@ Once the Docker image is built, you can run a Docker container using the followi
 
 ## Access the API:
 You can now access the API endpoints by navigating to the following URL in your browser:
+- [API](http://localhost:8000/)
 
 To access the interactive API documentation provided by Swagger UI, navigate to the following URL in your browser:
 
