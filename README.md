@@ -64,7 +64,7 @@ Install the required Python dependencies using pip and the requirements.txt file
 ### Run the Application
 Once the dependencies are installed, you can run the application using Uvicorn:
    ```bash
-   uvicorn app.main:app --host 0.0.0.0 --port 8000
+   uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
    ```
 
 ## Access the API:
