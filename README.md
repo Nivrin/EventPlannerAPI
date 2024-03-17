@@ -66,7 +66,7 @@ Once the dependencies are installed, you can run the application using Uvicorn:
    ```bash
    uvicorn app.main:app --host 0.0.0.0 --port 8000
    ```
-g
+
 ## Access the API:
 You can now access the API endpoints by navigating to the following URL in your browser:
 
